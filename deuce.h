@@ -137,6 +137,7 @@ struct bsm_sequence {
 	int				 bs_seq_serial;
 	int				 bs_seq_time_wnd;
 	int				 bs_seq_time_wnd_prob;
+	const char			*bs_zonename;
 };
 
 struct bsm_record_data {
@@ -156,6 +157,7 @@ struct bsm_record_data {
 	int		 br_sid;	/* Session ID */
 	dev_t		 br_dev;	/* For fs objects, the device id. */
 	ino_t		 br_inode;	/* For fs objects, the inode. */
+	const char	*br_zonename;	/* Zone name */
 };
 
 #endif	/* DEUCE_H_ */

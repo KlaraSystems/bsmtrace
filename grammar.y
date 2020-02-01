@@ -205,6 +205,7 @@ sequence_def:
 		if ((bs_state = calloc(1, sizeof(*bs_state))) == NULL)
 			bsmtrace_fatal("%s: calloc failed", __func__);
 		/* This will be a parent sequence. */
+		bs_state->bs_zonename = conf_current_zonename();
 		bs_state->bs_seq_flags |= BSM_SEQUENCE_PARENT;
 		bs_state->bs_seq_scope = BSM_SCOPE_GLOBAL;
                 bs_state->bs_subj_type = SET_TYPE_NOOP;
