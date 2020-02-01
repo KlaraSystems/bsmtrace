@@ -153,7 +153,7 @@ main(int argc, char *argv[])
 	(void) signal(SIGCHLD, SIG_IGN); /* Ignore dying children */
 	(void) signal(SIGINT, bsmtrace_handle_sigint);
 	set_default_settings(&opts);
-	while ((ch = getopt(argc, argv, "Fa:Bbdf:hil:np:v")) != -1) {
+	while ((ch = getopt(argc, argv, "Fa:Bbdf:hil:np:vz:")) != -1) {
 		switch (ch) {
 		case 'B':
 			opts.Bflag = 1;
@@ -185,6 +185,9 @@ main(int argc, char *argv[])
 		case 'v':
 			(void) fprintf(stderr, "%s\n", BSMTRACE_VERSION);
 			exit(0);
+		case 'z':
+			opts.zflag = optarg;
+			break;
 		case 'h':
 		default:
 			usage(argv[0]);
@@ -192,6 +195,8 @@ main(int argc, char *argv[])
 		}
 	}
 	conf_load(opts.fflag);
+	if (opts.zflag != NULL)
+		conf_zone_load(opts.zflag);
 	if (opts.nflag != 0)
 		return (0);
 	log_init_dir();
