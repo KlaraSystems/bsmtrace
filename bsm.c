@@ -283,6 +283,18 @@ bsm_check_parent_sequence(struct bsm_sequence *bs, struct bsm_record_data *bd)
 	match = bsm_check_subj_array(subj, &bs->bs_subj.bs_par_subj);
 	if (match == 0 && (bs->bs_seq_flags & BSM_SEQUENCE_SUBJ_ANY) == 0)
 		return (0);
+	if (bs->bs_zonename != NULL) {
+		/*
+		 * Sequences with no zone spec (i.e. global config) may match
+		 * a sequence from any zone.  If the sequence has a specified
+		 * zone, though, then it must match.
+		 */
+		if (bd->br_zonename == NULL)
+			return (0);
+		match = strcmp(bs->bs_zonename, bd->br_zonename) == 0;
+		if (match == 0)
+			return (0);
+	}
 	assert(bs->bs_cur_state == NULL && !TAILQ_EMPTY(&bs->bs_mhead));
 	bm = TAILQ_FIRST(&bs->bs_mhead);
 	/* Match event. */
