@@ -36,6 +36,7 @@ extern int 		lineno;
 struct bsm_set		*conf_get_bsm_set(char *);
 struct bsm_sequence	*conf_get_parent_sequence(char *);
 void			 conf_load(char *);
+void			 conf_zone_load(const char *);
 void			 conf_detail(int, const char *, ...) __attribute__ ((noreturn));
 void			 conf_handle_multiplier(struct bsm_sequence *,
 			     struct bsm_state *);
@@ -43,6 +44,7 @@ void			 conf_array_add(const char *, struct array *, int);
 void			 conf_sequence_set_subj(struct bsm_sequence *,
 			     struct bsm_set *, int);
 int			 conf_set_type(char *);
+const char	*conf_current_zonename(void);
 void			 yyerror(const char *);
 int			 yywrap(void);
 void			 conf_set_log_channel(struct bsm_set *,

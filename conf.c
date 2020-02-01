@@ -28,7 +28,9 @@
  * SUCH DAMAGE.
  */
 #include "includes.h"
+#include <dirent.h>
 #include <err.h>
+#include <stdbool.h>
 
 static const struct _settype_tab {
 	char	*stt_str;
@@ -55,6 +57,17 @@ extern int	 yyparse(void);
 bsm_set_head_t	 bsm_set_head;
 int		 lineno = 1;
 static const char		*conffile;
+
+static bool conf_curzone_referenced;
+static const char *conf_curzone;
+
+const char *
+conf_current_zonename(void)
+{
+
+	conf_curzone_referenced = true;
+	return (conf_curzone);
+}
 
 /*
  * Return BSM set named str, or NULL if the set was not found in the BSM set
@@ -83,22 +96,67 @@ conf_get_parent_sequence(char *str)
 	return (NULL);
 }
 
-/*
- * Load configuration file from path.
- */
-void
-conf_load(char *path)
+static void
+conf_load_common(const char *path, const char *zone)
 {
 	FILE *f;
 
 	f = fopen(path, "r");
 	if (f == NULL)
 		bsmtrace_fatal("%s: %s", path, strerror(errno));
+	conf_curzone_referenced = false;
+	conf_curzone = zone;
 	conffile = path;
 	yyin = f;
-	TAILQ_INIT(&bsm_set_head);
 	yyparse();
+	conf_curzone = NULL;
 	(void) fclose(f);
+}
+
+/*
+ * Load configuration file from path.
+ */
+void
+conf_load(char *path)
+{
+
+	TAILQ_INIT(&bsm_set_head);
+	conf_load_common(path, NULL);
+}
+
+/*
+ * Load zone configuration files from path.
+ */
+void
+conf_zone_load(const char *path)
+{
+	char file[MAXPATHLEN + 1];
+	DIR *dir;
+	struct dirent *dent;
+	char *suffix, *zone;
+
+	dir = opendir(path);
+	if (dir == NULL)
+		return;
+	while ((dent = readdir(dir)) != NULL) {
+		if (strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
+			continue;
+		zone = strdup(dent->d_name);
+		if (zone == NULL)
+			err(1, "Failed to allocate memory");
+		suffix = strstr(zone, ".conf");
+		if (suffix == NULL) {
+			free(zone);
+			continue;
+		}
+		*suffix = '\0';
+		/* Should be safe; readdir returned dent in response to path request. */
+		sprintf(file, "%s/%s", path, dent->d_name);
+		conf_load_common(file, zone);
+		if (!conf_curzone_referenced)
+			free(zone);
+	}
+	closedir(dir);
 }
 
 /*
