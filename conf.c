@@ -349,7 +349,7 @@ void
 yyerror(const char *str)
 {
 
-	conf_detail(0, "syntax error near '%s'", yytext);
+	conf_detail(0, "syntax error near '%s' (%s)", yytext, str);
 }
 
 int
