@@ -61,6 +61,8 @@ static const char		*conffile;
 static bool conf_curzone_referenced;
 static const char *conf_curzone;
 
+const char	*yyfile;
+
 const char *
 conf_current_zonename(void)
 {
@@ -106,7 +108,7 @@ conf_load_common(const char *path, const char *zone)
 		bsmtrace_fatal("%s: %s", path, strerror(errno));
 	conf_curzone_referenced = false;
 	conf_curzone = zone;
-	conffile = path;
+	yyfile = conffile = path;
 	yyin = f;
 	yyparse();
 	conf_curzone = NULL;
@@ -173,7 +175,7 @@ conf_detail(int ln, const char *fmt, ...)
 	va_start(ap, fmt);
 	(void) vsnprintf(buf, sizeof(buf), fmt, ap);
 	va_end(ap);
-	bsmtrace_fatal("%s:%d: %s", conffile, ln, buf);
+	bsmtrace_fatal("%s:%d: %s", yyfile, ln, buf);
 }
 
 /*
