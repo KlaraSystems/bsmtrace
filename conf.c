@@ -126,6 +126,13 @@ conf_load(char *path)
 	conf_load_common(path, NULL);
 }
 
+const char *
+conf_get_file(void)
+{
+
+	return (conffile);
+}
+
 /*
  * Load zone configuration files from path.
  */

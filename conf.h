@@ -45,6 +45,7 @@ void			 conf_array_add(const char *, struct array *, int);
 void			 conf_sequence_set_subj(struct bsm_sequence *,
 			     struct bsm_set *, int);
 int			 conf_set_type(char *);
+const char	*conf_get_file(void);
 const char	*conf_current_zonename(void);
 void			 yyerror(const char *);
 int			 yywrap(void);
